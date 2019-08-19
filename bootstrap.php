@@ -11,5 +11,6 @@ if (file_exists($composer = __DIR__ . '/vendor/autoload.php')) {
 }
 
 // Constants & helpers
+require_once __DIR__ . '/src/constants.php';
 
 // Services
