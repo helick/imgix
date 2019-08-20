@@ -15,3 +15,4 @@ require_once __DIR__ . '/src/constants.php';
 require_once __DIR__ . '/src/helpers.php';
 
 // Services
+\Helick\Imgix\Content::boot();
