@@ -37,7 +37,7 @@ function url(string $imageUrl, array $args = [], bool $useHttps = true, string $
      * @param string $imageUrl
      * @param array  $args
      */
-    $isProcessable = apply_filters('imgix_image_url_processable', true, $imageUrl, $args);
+    $isProcessable = apply_filters('helick_imgix_image_url_processable', true, $imageUrl, $args);
     $isProcessable = (bool)$isProcessable;
 
     if (!$requiresProcessing || !$isProcessable) {
@@ -57,7 +57,7 @@ function url(string $imageUrl, array $args = [], bool $useHttps = true, string $
      * @param string $imageUrlPath
      * @param array  $args
      */
-    $imageUrlPath = apply_filters('imgix_image_url_path', $imageUrlPath, $args);
+    $imageUrlPath = apply_filters('helick_imgix_image_url_path', $imageUrlPath, $args);
 
     /**
      * Control the imgix arguments.
@@ -65,7 +65,7 @@ function url(string $imageUrl, array $args = [], bool $useHttps = true, string $
      * @param array  $args
      * @param string $imageUrlPath
      */
-    $args = apply_filters('imgix_args', $args, $imageUrlPath);
+    $args = apply_filters('helick_imgix_args', $args, $imageUrlPath);
 
     $urlBuilder = new UrlBuilder(domain(), $useHttps, $signKey);
     $imgixUrl   = $urlBuilder->createURL($imageUrlPath, $args);
@@ -77,7 +77,7 @@ function url(string $imageUrl, array $args = [], bool $useHttps = true, string $
      * @param string $imageUrl
      * @param array  $args
      */
-    $imgixUrl = apply_filters('imgix_url', $imgixUrl, $imageUrl, $args);
+    $imgixUrl = apply_filters('helick_imgix_url', $imgixUrl, $imageUrl, $args);
 
     return $imgixUrl;
 }
