@@ -35,17 +35,17 @@ final class Content implements Bootable
             _prime_post_caches($attachmentIds, false, true);
         }
 
-        foreach ($images['img_tags'] as $index => $tag) {
-            $transform = 'resize';
+        foreach ($images['img_tags'] as $index => $imageTag) {
+            $imageUrl = $images['img_urls'][$index];
 
-            $attachmentId = null;
-
-            $fullSizeUrl = null;
-
-            $src = $srcOrig = $images['img_urls'][$index];
-
-            if (!apply_filters('imgix_image_url_processable', true, $src))
+            if (!is_processable_image_url($imageUrl)) {
                 continue;
+            }
+
+            [$imageWidth, $imageHeight] = $this->resolveImageSize($imageTag);
+
+            var_dump($imageUrl, $imageWidth, $imageHeight);
+            die;
         }
 
         return $content;
@@ -59,8 +59,8 @@ final class Content implements Bootable
     private function resolveImages(string $content): array
     {
         $pattern = '#(?:<a[^>]+?href=["|\'](?P<link_urls>[^\s]+?)["|\'][^>]*?>\s*)'
-            . '?(?P<img_tags><img[^>]+?src=["|\'](?P<img_urls>[^\s]+?)["|\'].*?>){1}'
-            . '(?:\s*</a>)?#is';
+            . '?(?P<img_tags><(?:img|amp-img|amp-anim)[^>]*?\s+?src=["|\']'
+            . '(?P<img_urls>[^\s]+?)["|\'].*?>){1}(?:\s*</a>)?#is';
 
         if (!preg_match_all($pattern, $content, $images)) {
             return [];
@@ -87,5 +87,49 @@ final class Content implements Bootable
         }
 
         return array_keys($attachmentIds);
+    }
+
+    /**
+     * @param string $tag
+     *
+     * @return array
+     */
+    private function resolveImageSize(string $tag): array
+    {
+        $width = $height = null;
+
+        // First, let's check the tag attributes
+        if (preg_match('#width=["|\']?([\d%]+)["|\']?#i', $tag, $matches)) {
+            $width = $matches[1];
+        }
+
+        if (preg_match('#height=["|\']?([\d%]+)["|\']?#i', $tag, $matches)) {
+            $height = $matches[1];
+        }
+
+        if (strpos($width, '%') !== false && strpos($height, '%') !== false) {
+            $width = $height = null;
+        }
+
+        // Second, let's check for size class
+        if (preg_match('#class=["|\']?[^"\']*size-([^"\'\s]+)[^"\']*["|\']?#i', $tag, $size)) {
+            $size = array_pop($size);
+
+            if ($width === null && $height === null && $size !== 'full') {
+
+            }
+        }
+
+        if (preg_match('#class=["|\']?[^"\']*wp-image-([\d]+)[^"\']*["|\']?#i', $tag, $attachmentId)) {
+            $attachmentId = array_pop($attachmentId);
+
+            $attachment = get_post($attachmentId);
+
+            if ($attachment && !is_wp_error($attachment) && $attachment->post_type === 'attachment') {
+
+            }
+        }
+
+        return compact('width', 'height');
     }
 }
